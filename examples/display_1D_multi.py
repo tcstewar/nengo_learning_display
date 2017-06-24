@@ -1,7 +1,4 @@
 import nengo_learning_display
-import nengo_learning_display.one_dim
-import imp
-imp.reload(nengo_learning_display.one_dim)
 import nengo
 import numpy as np
 
@@ -28,7 +25,7 @@ with model:
     
     nengo.Connection(stim, pre)
     
-    plot = nengo_learning_display.one_dim.Plot1D(c, 
+    plot = nengo_learning_display.Plot1D(c, 
                 domain=np.linspace(-2,2,30), 
                 range=(-1.5,1.5))
     

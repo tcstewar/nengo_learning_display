@@ -1,7 +1,4 @@
 import nengo_learning_display
-import nengo_learning_display.two_dim
-import imp
-imp.reload(nengo_learning_display.two_dim)
 import nengo
 import numpy as np
 
@@ -28,7 +25,7 @@ with model:
     grid = np.meshgrid(np.linspace(-1, 1, 20), np.linspace(-1,1,20))
     grid = np.array(grid).T
 
-    plot = nengo_learning_display.two_dim.Plot2D(c, 
+    plot = nengo_learning_display.Plot2D(c, 
                 domain=grid, 
                 range=(-0.5,0.5),
                 dimension=1)
