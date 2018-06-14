@@ -2,7 +2,7 @@ import nengo
 import numpy as np
 
 class Plot1D(nengo.Node):
-    def __init__(self, connection, domain, range):
+    def __init__(self, connection, domain, range, transform=1):
         self.connection = connection
 
         ensemble = connection.pre_obj
@@ -22,6 +22,7 @@ class Plot1D(nengo.Node):
         self.sim = None
         self.w = None
         self.range = range
+        self.transform = transform
 
         self.svg_x = np.linspace(0, 100, len(domain))
 
@@ -34,14 +35,15 @@ class Plot1D(nengo.Node):
                 <line x1=0 y1=50 x2=100 y2=50 stroke="#aaaaaa"/>
             </svg>'''
 
-        self.palette = ["#1c73b3", "#039f74", "#d65e00", 
+        self.palette = ["#1c73b3", "#039f74", "#d65e00",
                         "#cd79a7", "#f0e542", "#56b4ea"]
 
         def plot(t):
             if self.w is None:
                 return
             y = np.dot(self.a, self.w.T)
-            
+            y = np.dot(y, self.transform).T
+
             min_y = self.range[0]
             max_y = self.range[1]
             data = (-y - min_y) * 100 / (max_y - min_y)
@@ -52,10 +54,10 @@ class Plot1D(nengo.Node):
                 for j, d in enumerate(row):
                     path.append('%1.0f %1.0f' % (self.svg_x[j], d))
                 paths.append('<path d="M%s" fill="none" stroke="%s"/>' %
-                             ('L'.join(path), 
+                             ('L'.join(path),
                               self.palette[i % len(self.palette)]))
 
-            plot._nengo_html_ = template % (''.join(paths))     
+            plot._nengo_html_ = template % (''.join(paths))
 
         super(Plot1D, self).__init__(plot, size_in=0, size_out=0)
         self.output._nengo_html_ = template % ''
@@ -64,7 +66,7 @@ class Plot1D(nengo.Node):
         if sim is None:
             return
         if self.a is None:
-            _, self.a = nengo.utils.ensemble.tuning_curves(self.ensemble, 
+            _, self.a = nengo.utils.ensemble.tuning_curves(self.ensemble,
                                                            sim, self.domain)
         self.w = sim._probe_outputs[self.decoder_probe][-1]
         del sim._probe_outputs[self.decoder_probe][:]
